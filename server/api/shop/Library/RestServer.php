@@ -40,8 +40,9 @@ class RestServer{
             $this->method = 'delete'.ucfirst($table);
              break;
         case 'PUT':
-            parse_str(file_get_contents("php://input"), $this->params);
-            //var_dump($this->params);die();
+            $this->params = file_get_contents("php://input");
+            $this->params = json_decode($this->params);
+           //var_dump($this->params->login);die();
             $this->method = 'put'.ucfirst($table);
             break;
         case 'OPTIONS':

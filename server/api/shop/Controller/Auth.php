@@ -3,16 +3,20 @@
 class Auth extends Controller
 {
     
-    public function getAuth($param)
+    public function getAuth($params)
     {
-         if(count($param) != 1){
+       // return ['status'=>200,'data'=>$param];
+         if(count($params) != 2){
              return ['status'=>400, 'data'=>['there is not enough data']];
         }
-        $model = new AuthModel();
-        $time_life = $model->isLogin($param);
-        $time_now =  time();
-        if($time_life > $time_now)
+         $model = new AuthModel();
+         $time_life = $model->isLogin(['login'=>$params[1],'status'=>$params[0]]);
+         $time_now =  time();
+        //return['time'=>$time_now, 'life'=>$time_life];
+
+        if($time_life > $time_now){
             return ['status'=>200, 'data'=>true];
+        }
         return ['status'=>400, 'data'=>['hesh is not valid']];
     }
     
@@ -44,24 +48,26 @@ class Auth extends Controller
     {
        // return ['status'=>200, 'data'=>$params];
          //return ['status'=>200, 'data'=>$params['login']];
-            if(count($params) != 2){
-                return ['status'=>400, 'data'=>['there is not enough data']];
-            }
-            
-            $pass = md5($params['password']);
+           // if(count($params) != 2){
+              //  return ['status'=>400, 'data'=>['there is not enough data']];
+           // }
+
+
+            $pass = md5($params->password);
             $str= 'passsolt';
             $str = md5($str);
-            $pass_db = md5($params['password'].$str);
-            $params['password'] = $pass_db;
+            $pass_db = md5($params->password.$str);
+            $fparams['password'] = $pass_db;
 
             $model = new AuthModel();
-            $isUser = $model->isUser($params['login']);
+            $isUser = $model->isUser(['login'=>$params->login,'password'=>$params->password]);
             if(!$isUser)
                 return ['status'=>400, 'data'=>['user not exists']];
-            
-            $params['status'] = $this->setHash(); 
-            $params['time_life'] =  time()+LIFE_ACTIVE_LOGIN;
-            return $model->setLogin($params);
+
+            $fparams['login']= $params->login;
+            $fparams['status'] = $this->setHash(); 
+            $fparams['time_life'] =  time()+LIFE_ACTIVE_LOGIN;
+            return $model->setLogin($fparams);
     }
     
 
@@ -78,4 +84,6 @@ class Auth extends Controller
         
         return md5($rand.$countUsers);
     }
+
+
 }

@@ -89,9 +89,9 @@ class AuthModel extends Model{
         } 
       }
       
-        public function isLogin($status){
-             $sth = $this->pdo->prepare('SELECT  time_life  FROM   users_rest WHERE status=:status');
-             $sth->execute(['status'=>$status]);    
+        public function isLogin($params){
+             $sth = $this->pdo->prepare('SELECT  time_life  FROM   users_rest WHERE status=:status AND login=:login');
+             $sth->execute($params);    
              $res = $sth->fetch(\PDO::FETCH_NUM);
              return $res[0];
         }
